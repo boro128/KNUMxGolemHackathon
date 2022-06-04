@@ -18,13 +18,13 @@ def extract_bboxes_from_img(save_img_dir, dir_from, filename, boxes):
 
         im_path = os.path.join(dir_from, filename)
 
-        im = Image.open(im_path)
-        cropped = im.crop((x, y, x + width, y + height))
+        with Image.open(im_path) as im:
+            cropped = im.crop((x, y, x + width, y + height))
 
-        # new name: {old_image_name}__{image_id}__{bounding_box_id}.png
-        new_filename = f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"
-        cropped.save(os.path.join(
-            save_img_dir, new_filename))
+            # new name: {old_image_name}__{image_id}__{bounding_box_id}.png
+            new_filename = f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"
+            cropped.save(os.path.join(
+                save_img_dir, new_filename))
 
         new_im_info = {'im_id': row['image_id'], 'bbox_id': row['id'],
                        'width': cropped.size[0], 'height': cropped.size[1],
