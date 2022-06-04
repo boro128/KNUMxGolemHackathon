@@ -7,7 +7,7 @@ import pandas as pd
 from PIL import Image
 
 
-def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
+def extract_bboxes_from_img(save_img_dir, dir_from, filename, boxes):
     created_bboxes = []
 
     for _, row in boxes.iterrows():
@@ -24,7 +24,7 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
         # new name: {old_image_name}__{image_id}__{bounding_box_id}.png
         new_filename = f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"
         cropped.save(os.path.join(
-            save_dir, "images", new_filename))
+            save_img_dir, new_filename))
 
         new_im_info = {'im_id': row['image_id'], 'bbox_id': row['id'],
                        'width': cropped.size[0], 'height': cropped.size[1],
@@ -36,7 +36,7 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
     return created_bboxes
 
 
-def extract_bboxes(save_dir, dir_from, images, annotations):
+def extract_bboxes(save_dir, save_img_dir, dir_from, images, annotations):
 
     csv_path = os.path.join(save_dir, "bboxes_data.csv")
     if os.path.exists(csv_path):
@@ -48,7 +48,7 @@ def extract_bboxes(save_dir, dir_from, images, annotations):
         boxes = annotations[annotations['image_id'] == row['id']]
 
         created_bboxes = extract_bboxes_from_img(
-            save_dir, dir_from, row['file_name'], boxes)
+            save_img_dir, dir_from, row['file_name'], boxes)
         all_created_bboxes.extend(created_bboxes)
 
     df = pd.DataFrame(all_created_bboxes)
@@ -69,8 +69,9 @@ def main():
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.save_dir):
-        os.makedirs(args.save_dir)
+    save_img_dir = os.path.join(args.save_dir, "images")
+    if not os.path.isdir(save_img_dir):
+        os.makedirs(save_img_dir)
 
     with open(args.data_json, 'r') as f:
         data = json.load(f)
@@ -78,7 +79,7 @@ def main():
     images = pd.DataFrame(data['images'])
     annotations = pd.DataFrame(data['annotations'])
 
-    extract_bboxes(args.save_dir, args.dir_from, images, annotations)
+    extract_bboxes(args.save_dir, save_img_dir, args.dir_from, images, annotations)
 
 
 if __name__ == '__main__':
