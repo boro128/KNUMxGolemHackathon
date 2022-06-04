@@ -23,7 +23,7 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
 
         # new name: {old_image_name}__{image_id}__{bounding_box_id}.png
         cropped.save(os.path.join(
-            save_dir, f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"))
+            save_dir, "images", f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"))
 
         new_im_info = {'im_id': row['image_id'], 'bbox_id': row['id'],
                        'width': cropped.size[0], 'height': cropped.size[1],
@@ -35,7 +35,12 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
 
 
 def extract_bboxes(save_dir, dir_from, images, annotations):
-    all_created_bboxes = []
+
+    csv_path = os.path.join(save_dir, "bboxes_data.csv")
+    if os.path.exists(csv_path):
+        all_created_bboxes = pd.read_csv(csv_path).to_dict(orient='records')
+    else:
+        all_created_bboxes = []
 
     for _, row in images.iterrows():
         boxes = annotations[annotations['image_id'] == row['id']]
@@ -45,7 +50,8 @@ def extract_bboxes(save_dir, dir_from, images, annotations):
         all_created_bboxes.extend(created_bboxes)
 
     pd.DataFrame(all_created_bboxes).to_csv(
-        os.path.join(save_dir, 'bboxes_data.csv'))
+        os.path.join(save_dir, 'bboxes_data.csv'),
+        index=False)
 
 
 def main():
