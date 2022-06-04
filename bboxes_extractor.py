@@ -28,7 +28,7 @@ def extract_bboxes_from_img(save_img_dir, dir_from, filename, boxes):
 
         new_im_info = {'im_id': row['image_id'], 'bbox_id': row['id'],
                        'width': cropped.size[0], 'height': cropped.size[1],
-                       'new_filename': new_filename,
+                       'filename': new_filename,
                        'category_id': row['category_id']}
 
         created_bboxes.append(new_im_info)
