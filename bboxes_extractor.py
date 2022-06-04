@@ -22,11 +22,13 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
         cropped = im.crop((x, y, x + width, y + height))
 
         # new name: {old_image_name}__{image_id}__{bounding_box_id}.png
+        new_filename = f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"
         cropped.save(os.path.join(
-            save_dir, "images", f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"))
+            save_dir, "images", new_filename))
 
         new_im_info = {'im_id': row['image_id'], 'bbox_id': row['id'],
                        'width': cropped.size[0], 'height': cropped.size[1],
+                       'new_filename': new_filename,
                        'category_id': row['category_id']}
 
         created_bboxes.append(new_im_info)
@@ -49,7 +51,9 @@ def extract_bboxes(save_dir, dir_from, images, annotations):
             save_dir, dir_from, row['file_name'], boxes)
         all_created_bboxes.extend(created_bboxes)
 
-    pd.DataFrame(all_created_bboxes).to_csv(
+    df = pd.DataFrame(all_created_bboxes)
+    df = df.drop_duplicates()
+    df.to_csv(
         os.path.join(save_dir, 'bboxes_data.csv'),
         index=False)
 
