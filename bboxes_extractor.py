@@ -36,17 +36,19 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
 
     return created_bboxes
 
+
 def extract_bboxes(save_dir, dir_from, images, annotations):
     all_created_bboxes = []
 
     for _, row in images.iterrows():
         boxes = annotations[annotations['image_id'] == row['id']]
 
-        created_bboxes = extract_bboxes_from_img(save_dir, dir_from, row['file_name'], boxes)
+        created_bboxes = extract_bboxes_from_img(
+            save_dir, dir_from, row['file_name'], boxes)
         all_created_bboxes.extend(created_bboxes)
 
-    pd.DataFrame(all_created_bboxes).to_csv(os.path.join(save_dir, 'bboxes_data.csv'))
-
+    pd.DataFrame(all_created_bboxes).to_csv(
+        os.path.join(save_dir, 'bboxes_data.csv'))
 
 
 def main():
@@ -65,7 +67,7 @@ def main():
 
     images = pd.DataFrame(data['images'])
     annotations = pd.DataFrame(data['annotations'])
-    
+
     extract_bboxes(args.save_dir, args.dir_from, images, annotations)
 
 
