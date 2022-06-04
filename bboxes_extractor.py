@@ -21,9 +21,6 @@ def extract_bboxes_from_img(save_dir, dir_from, filename, boxes):
         im = Image.open(im_path)
         cropped = im.crop((x, y, x + width, y + height))
 
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-
         # new name: {old_image_name}__{image_id}__{bounding_box_id}.png
         cropped.save(os.path.join(
             save_dir, f"{filename[:-4]}__{row['image_id']}__{row['id']}.png"))
@@ -61,6 +58,9 @@ def main():
                         required=True, type=str)
 
     args = parser.parse_args()
+
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
 
     with open(args.data_json, 'r') as f:
         data = json.load(f)
